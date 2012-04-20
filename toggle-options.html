@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Toggle Environment</title>
+	<script type="text/javascript" src="jquery.min.js"></script>
+
+	<script type="text/javascript">
+		var theTab  
+		var environments = [                           
+			{name : "extdev", url: "extdev"},
+			{name : "sandbox", url: "pal.sandbox.dev"},
+			{name : "int", url: "www.int"},
+			{name : "test", url: "www.test"},
+			{name : "stage", url: "www.stage"},
+			{name : "www-live", url: "www.live"},
+			{name : "www", url: "www"}						
+		]
+		function saveBookmark(storageObject) {
+			try {
+				 localStorage.setItem(storageObject.link, JSON.stringify(storageObject)); //saves to the database, "key", "value"
+			} catch (e) {
+				 if (e == QUOTA_EXCEEDED_ERR) {
+				 	 alert('Quota exceeded!'); //data wasn't successfully saved due to quota exceed so throw an error
+				}
+			}
+		}
+		function removeBookmark(bookmark_id) {
+			console.log("attempting to remove " + bookmark_id);
+			localStorage.removeItem(bookmark_id);
+			return true;
+		}
+		function getBookmarks() {
+			var logLength = localStorage.length-1; //how many items are in the database starting with zero
+			var items = [];
+			//now we are going to loop through each item in the database
+			for (i = 0; i <= logLength; i++) {
+			        //lets setup some variables for the key and values
+					console.log(i);
+			        var itemKey = localStorage.key(i);
+			        var values = localStorage.getItem(itemKey);
+					items.push(JSON.parse(localStorage.getItem(itemKey)));
+			}
+			items.sort(function(a,b){
+				return b.created_at - a.created_at;
+			});
+			return items;
+		}
+		chrome.extension.onRequest.addListener(
+		function(request, sender, sendResponse) {
+		  console.log(sender.tab ?
+		              "from a content script:" + sender.tab.url :
+		              "from the extension");
+		  if(request.storageObject) {
+			saveBookmark(request.storageObject);
+			sendResponse({saved: "true"});
+		  } else if(request.remove == "true") {
+			if(removeBookmark(request.item)) {
+				sendResponse({success: "true"})
+			}
+	 	  } else if(request.bookmarks == "get") {
+			sendResponse({bookmarks: getBookmarks()});
+		  } else if (request.greeting == "hello")
+		    sendResponse({farewell: "goodbye"});
+		  else
+		    sendResponse({}); // snub them.
+		});
+		
+		function get(obj, url){
+			var elem = document.createElement("a");        
+			elem.id = obj.name;
+			elem.href = url;
+			elem.appendChild(document.createTextNode(obj.name));
+			elem.addEventListener("click", clickAction, false); 
+			var li = document.createElement("li");
+			li.appendChild(elem);			
+			return li;
+		}        
+		function clickAction(event)
+		{                
+			event.preventDefault();
+			obj = {url : this.href, selected: true}
+			chrome.tabs.update(theTab.id, obj);
+			return false;
+		}
+		function loadURLSwitcher()
+		{
+			var url = theTab.url;  
+			t = url.split("//");
+			newURL = t.shift() + "//";
+			t = t.join("//");
+			t = t.split(".bbc");
+			env = t.shift();
+			path = t.join(".bbc");		
+			
+			var toggler = document.getElementById("toggler");
+			var notBBC = document.getElementById("notBBC");
+			if(url.indexOf(".bbc.co.uk") < 0)
+			{           
+				toggler.className = "hidden";
+				notBBC.className = "";
+			}        
+			for(var inc=0;inc<environments.length;inc++)
+			{
+				
+				sb = get(environments[inc], newURL + environments[inc].url + ".bbc" + path);
+				toggler.appendChild(sb);
+			}
+			 
+		}   
+		// runs on button press
+		//chrome.tabs.getSelected(null, function(tab){
+		//	theTab = tab;
+		//	loadURLSwitcher();			
+		//});
+		chrome.browserAction.onClicked.addListener(function(tab) {
+		//chrome.tabs.getSelected(null, function(tab) {
+		  console.log("about to bookmark");
+		  chrome.tabs.sendRequest(tab.id, {bookmark: "true"}, function(response) {
+		    console.log(response.farewell);
+		  });
+		});
+		
+	function buildBookmark(bookmark) {
+		b_id= generateID(bookmark.link)
+		if(bookmark.post_comment == undefined) {
+			bookmark.post_comment = "";
+		}	
+		if(bookmark.pre_comment == undefined) {
+			bookmark.pre_comment = "";
+		}
+		bk_text = (bookmark.selection) ? bookmark.selection : bookmark.description;
+		bm = $('<li id="' + b_id + '">' +
+			'<label for="' + b_id + '_pre_comment">Comment</label><textarea class="pre_comment" id="' + b_id + '_pre_comment" name="'+b_id +'_pre_comment">' + bookmark.pre_comment + '</textarea>' +
+			'<a class="remove" href="#">REMOVE</a><a class="link" href="' + bookmark.link +'">' +
+			'<span class="title">' + bookmark.title + '</span>' +
+			'<img src="' + bookmark.image + '" alt="" /></a>' +
+			'<span class="description">' + bk_text + '</span>' +
+			'<label for="' + b_id + '_comment">Comment</label><textarea class="post_comment" id="' + b_id + '_comment" name="'+b_id +'_comment">' + bookmark.post_comment + '</textarea></li>');
+			console.log(bm);
+		return bm
+	}
+	function generateID(item_id) {
+		return encodeURIComponent(item_id).replace(/\%/g, '_').replace(/\./g, '_').replace(/\(/g, '_').replace(/\)/g, '_');
+	}
+	$(document).ready(function(){
+		bk = getBookmarks();
+		console.log(bk);
+		for(var i=bk.length-1;i>=0;i--) {
+			$("#story").append(buildBookmark(bk[i]));
+		}
+		$("textarea.post_comment").change(function(){
+			l_id = $(this).parent().find("a.link").attr("href");
+			bk = JSON.parse(localStorage.getItem(l_id));
+			bk.post_comment = $(this).val();
+			saveBookmark(bk);
+		});
+		$("textarea.pre_comment").change(function(){
+			l_id = $(this).parent().find("a.link").attr("href");
+			bk = JSON.parse(localStorage.getItem(l_id));
+			bk.pre_comment = $(this).val();
+			saveBookmark(bk);
+		});
+		$(".remove").click(function(e){
+			e.preventDefault();
+			b_id = $(this).parent().find("a.link").attr("href");
+			removeBookmark(b_id);
+			actual_id = generateID(b_id);
+			$('#' + actual_id).fadeOut("slow", function(){
+				$(this).remove();
+			});
+		});
+	});
+	</script>
+	<link rel="stylesheet" href="story-view.css" />
+</head>
+<body id="bbc-prototype-story-bookmark-bar"> 
+	<h1><img src="blocks-big.png" />My&nbsp;Story</h1>
+	<ul id="story">                              
+	</ul>
+</body>
+</html>

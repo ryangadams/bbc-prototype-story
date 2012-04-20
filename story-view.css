@@ -1,0 +1,22 @@
+body{font-size:85%;font-family:helvetica, arial, sans-serif;}
+h1{font-size:2.6em;background:black;color:white;padding:10px;margin:0px auto;width:954px;}
+h1 img{padding-right:10px;}
+ul{margin:0px;padding:0px;}
+li{margin:0px;padding:0px 0px;}               
+
+#story{margin:10px auto;width:974px;}
+
+#bbc-prototype-story-bookmark-bar #story a{color: #88000;}
+#bbc-prototype-story-bookmark-bar #story  li{height:auto;float:none;margin:10px 5px;padding:5px;background:#fff;border:1px solid #dedede;;overflow:hidden;width:952px;position:relative;}
+#bbc-prototype-story-bookmark-bar #story span{display:block;}
+#bbc-prototype-story-bookmark-bar #story .title{color:#880000;font-size:2em;}
+.remove{font-size:0.6em;}
+.description{margin:10px;}
+#bbc-prototype-story-bookmark-bar #story img{float:left;clear:left;margin:10px;max-width:400px;}
+
+a:link;{border:0px;}
+a:hover{border:0px;}
+
+textarea{clear:both;width:90%;min-height:4em;background:#efefef;margin:0px auto 10px;display:block;}
+.remove{position:absolute;top:0px;right:0px;}
+label{font-size:0.8em;clear:both;display:block;margin:10px 0px 0px;}

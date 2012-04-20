@@ -1,0 +1,7 @@
+div#bbc-prototype-story-bookmark-bar{position:fixed;bottom:0px;left:0px;right:0px;padding:5px 10px;height:145px;background:rgba(204, 204, 204, 0.90);z-index:2000;overflow:auto;color:#000;font-size:12px;}
+#bbc-prototype-story-bookmark-bar a{color: #88000;}
+#bbc-prototype-story-bookmark-bar li{float:left;height:120px;margin:0px 5px;padding:5px;background:#fff;overflow:hidden;width:200px;}
+#bbc-prototype-story-bookmark-bar span{display:block;}
+#bbc-prototype-story-bookmark-bar .title{color:#880000;}
+#bbc-prototype-story-bookmark-bar img{width:100px;float:left;clear:left;margin-right:10px;}
+

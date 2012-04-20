@@ -1,0 +1,24 @@
+{
+  "name": "BBC StoryBuilder Prototype",
+  "version": "0.1",
+  "description": "Part of KandL Discovery Week",
+  "browser_action": {
+    "default_icon": "bbc-blocks-icon.png",
+	"default_title" : "Add to Story"
+  },
+  "background_page": "toggle-options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css" : ["story.css"],
+      "js": ["jquery.min.js", "bookmark.js"]
+    }
+  ],    
+  "icons" : {             
+	"48" : "bbc-icon48.png",
+  	"128" : "bbc-icon.png"
+  },
+  "permissions": [
+	"tabs"
+  ]
+}

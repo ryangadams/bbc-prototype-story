@@ -1,0 +1,12 @@
+body{font-size:85%;font-family:helvetica, arial, sans-serif;}
+h1{font-size:1em;}
+ul{margin:0px;padding:0px;}
+li{margin:0px;padding:0px 0px;}               
+li a{display:block;margin:2px 0px;padding:0.5em 2px;text-decoration:none;border:1px solid #fff;color:#0000cc;}
+li a:visited{color:#0000cc;}
+li a:hover{border:1px solid #333;color:#008800;}
+
+
+.hidden{display:none;}
+
+li a#extdev{border-bottom:2px solid #333;}
